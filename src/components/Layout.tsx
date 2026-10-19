@@ -190,17 +190,10 @@ export default function Layout() {
       </aside>
 
       <main id="main" className="main" tabIndex={-1}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={location.pathname.split('/')[1] || 'home'}
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduce ? undefined : { opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
+        {/* A CSS fade on each new page. No exit animation: waiting on one left pages invisible. */}
+        <div key={location.pathname.split('/')[1] || 'home'} className="page-in">
+          <Outlet />
+        </div>
 
         <footer className="footer">
           <Logo variant="stacked" className="footer-logo" />

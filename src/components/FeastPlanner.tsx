@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import { contact, feasting, privateDining } from '../data/baring'
 import { Star } from './Logo'
 
@@ -21,7 +21,10 @@ function Money({ value }: { value: number }) {
   const reduce = useReducedMotion()
   const mv = useMotionValue(value)
   const spring = useSpring(mv, { stiffness: 220, damping: 32 })
-  const text = useTransform(reduce ? mv : spring, (v) => money(v))
+  const target = useRef(value)
+  target.current = value
+  // Snap to the exact figure as the spring settles, so it never rests a penny out.
+  const text = useTransform(reduce ? mv : spring, (v) => money(Math.abs(v - target.current) < 0.5 ? target.current : v))
   useEffect(() => mv.set(value), [mv, value])
   return <motion.span>{text}</motion.span>
 }
@@ -298,94 +301,86 @@ export default function FeastPlanner() {
       </aside>
 
       <section id="enquire" className="enquire">
-        <AnimatePresence mode="wait" initial={false}>
-          {sent ? (
-            <motion.div
-              key="sent"
-              className="sent"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              <Star className="sent-star" />
-              <h3>Thank you{form.name ? `, ${form.name.split(' ')[0]}` : ''}.</h3>
-              <p>
-                We’ll reply from {contact.email} about {form.date ? `${formatDate(form.date)}` : 'dates'} and
-                availability for {guests}.
-              </p>
-              <pre className="sent-summary">{form.notes}</pre>
-              <p className="demo-note">This is a demo, so nothing has been sent.</p>
-              <p className="sent-actions">
-                <a className="button" href={mailto}>
-                  Email it instead
-                </a>
-                <button type="button" className="link-button" onClick={() => setSent(false)}>
-                  Change something
-                </button>
-              </p>
-            </motion.div>
-          ) : (
-            <motion.form key="form" onSubmit={submit} initial={false} exit={{ opacity: 0 }}>
-              <h3>Enquire about the room</h3>
-              <p className="step-note">Your choices are filled in below. We’ll come back to you by email.</p>
-              <div className="fields">
-                <label>
-                  <span>Name</span>
-                  <input
-                    required
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    autoComplete="name"
-                  />
-                </label>
-                <label>
-                  <span>Email</span>
-                  <input
-                    required
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    autoComplete="email"
-                  />
-                </label>
-                <label>
-                  <span>Phone</span>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    autoComplete="tel"
-                  />
-                </label>
-                <label>
-                  <span>Date</span>
-                  <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-                </label>
-                <fieldset className="sitting">
-                  <legend>Lunch or dinner</legend>
-                  {['Lunch', 'Dinner'].map((s) => (
-                    <label key={s}>
-                      <input
-                        type="radio"
-                        name="sitting"
-                        checked={form.sitting === s}
-                        onChange={() => setForm({ ...form, sitting: s })}
-                      />
-                      <span>{s}</span>
-                    </label>
-                  ))}
-                </fieldset>
-                <label className="wide">
-                  <span>Your feast</span>
-                  <textarea rows={9} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-                </label>
-              </div>
-              <button type="submit" className="button button-primary">
-                Send enquiry
+        {sent ? (
+          <div key="sent" className="sent rise-in">
+            <Star className="sent-star" />
+            <h3>Thank you{form.name ? `, ${form.name.split(' ')[0]}` : ''}.</h3>
+            <p>
+              We’ll reply from {contact.email} about {form.date ? `${formatDate(form.date)}` : 'dates'} and availability
+              for {guests}.
+            </p>
+            <pre className="sent-summary">{form.notes}</pre>
+            <p className="demo-note">This is a demo, so nothing has been sent.</p>
+            <p className="sent-actions">
+              <a className="button" href={mailto}>
+                Email it instead
+              </a>
+              <button type="button" className="link-button" onClick={() => setSent(false)}>
+                Change something
               </button>
-            </motion.form>
-          )}
-        </AnimatePresence>
+            </p>
+          </div>
+        ) : (
+          <form key="form" onSubmit={submit}>
+            <h3>Enquire about the room</h3>
+            <p className="step-note">Your choices are filled in below. We’ll come back to you by email.</p>
+            <div className="fields">
+              <label>
+                <span>Name</span>
+                <input
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  autoComplete="name"
+                />
+              </label>
+              <label>
+                <span>Email</span>
+                <input
+                  required
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  autoComplete="email"
+                />
+              </label>
+              <label>
+                <span>Phone</span>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  autoComplete="tel"
+                />
+              </label>
+              <label>
+                <span>Date</span>
+                <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              </label>
+              <fieldset className="sitting">
+                <legend>Lunch or dinner</legend>
+                {['Lunch', 'Dinner'].map((s) => (
+                  <label key={s}>
+                    <input
+                      type="radio"
+                      name="sitting"
+                      checked={form.sitting === s}
+                      onChange={() => setForm({ ...form, sitting: s })}
+                    />
+                    <span>{s}</span>
+                  </label>
+                ))}
+              </fieldset>
+              <label className="wide">
+                <span>Your feast</span>
+                <textarea rows={9} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              </label>
+            </div>
+            <button type="submit" className="button button-primary">
+              Send enquiry
+            </button>
+          </form>
+        )}
       </section>
     </div>
   )

@@ -50,6 +50,11 @@ jobs:
     needs: [build, deploy]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
       - name: Check the live site loads
         env:
           SITE_URL: ${{ needs.build.outputs.site_url }}
@@ -71,3 +76,7 @@ jobs:
           done
           echo "Site at $site did not come up with its assets and og.jpg"
           exit 1
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Click through the live site on a phone and a desktop
+        run: node scripts/check-live.mjs "${{ needs.build.outputs.site_url }}"

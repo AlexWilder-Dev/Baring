@@ -44,7 +44,8 @@ npm run icons     # favicon and apple-touch-icon from the logo
 Pushing to `main` builds and deploys to GitHub Pages (`.github/workflows/deploy.yml`). The workflow asks
 Pages where it serves this repo and builds for that address, so the asset paths and the absolute
 link-preview URLs in `index.html` always match the live site, whatever the repo is called. A final job
-loads the live page, its script bundle and `og.jpg`, and fails the run if any of them don't come back.
+loads the live page, its script bundle and `og.jpg`, then clicks through the site in a real browser on a
+phone and a desktop (`scripts/check-live.mjs`), and fails the run if anything doesn't show.
 
 ## Research
 

@@ -493,12 +493,8 @@ p {
   stroke: var(--ink-3);
 }
 
-.clock-headline-wrap {
-  min-height: 116px;
-}
-
 .clock-headline {
-  font-size: 38px;
+  font-size: clamp(30px, 9.6vw, 38px);
   line-height: 1.08;
   letter-spacing: -0.015em;
   margin-bottom: 10px;
@@ -733,6 +729,19 @@ p {
   margin: 8px 0 8px;
 }
 
+.lead-photo .photo-frame {
+  aspect-ratio: 3 / 2 !important;
+}
+
+/* Home two-up: the room photo takes the drawing's shape so the columns line up. */
+.two .photo-frame {
+  aspect-ratio: 400 / 340 !important;
+}
+
+.two .photo-frame img {
+  object-position: 50% 35%;
+}
+
 /* ---------- rule ---------- */
 
 .rule {
@@ -839,7 +848,7 @@ p {
 .card {
   background: var(--card);
   border: 1px solid var(--rule);
-  padding: 26px 18px 22px;
+  padding: 22px 16px 18px;
   transition:
     background-color var(--fade),
     border-color var(--fade);
@@ -1217,13 +1226,6 @@ p {
 
 .accolade-detail {
   margin: 0;
-}
-
-.pub-mark {
-  display: block;
-  width: 150px;
-  margin: 64px auto 24px;
-  color: var(--ink);
 }
 
 /* ---------- visit ---------- */
@@ -1766,6 +1768,11 @@ p {
     padding: 36px 40px 30px;
   }
 
+  .main {
+    max-width: 880px;
+    margin-inline: auto;
+  }
+
   .fields {
     grid-template-columns: 1fr 1fr;
   }
@@ -1777,6 +1784,81 @@ p {
   .footer-cols {
     grid-template-columns: repeat(3, auto);
     justify-content: start;
+  }
+}
+
+@media (max-width: 399px) {
+  .clock-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 720px) {
+  .two {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .planner {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    column-gap: 36px;
+    align-items: start;
+  }
+
+  .planner-steps,
+  .enquire {
+    grid-column: 1;
+  }
+
+  .tally {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: calc(var(--top) + var(--strip) + 16px);
+    bottom: auto;
+    margin: 0;
+  }
+
+  .tally-inner {
+    display: block;
+    border: 1px solid var(--ink);
+    padding: 20px;
+    background: var(--card);
+  }
+
+  .tally-total dt {
+    display: block;
+  }
+
+  .tally-head {
+    margin: 0 0 12px;
+  }
+
+  .tally-cta {
+    width: 100%;
+  }
+
+  .cta-long {
+    display: inline;
+  }
+
+  .cta-short {
+    display: none;
+  }
+
+  .tally .eyebrow,
+  .tally dl > div:not(.tally-total) {
+    display: flex;
+  }
+
+  .tally .eyebrow {
+    display: block;
+  }
+
+  .tally-total {
+    border-top: 1px solid var(--rule);
+    margin-top: 6px;
+    padding-top: 10px !important;
   }
 }
 
@@ -1836,10 +1918,6 @@ p {
     font-size: 32px;
   }
 
-  .side .clock-headline-wrap {
-    min-height: 136px;
-  }
-
   .side .clock-actions {
     grid-template-columns: 1fr;
   }
@@ -1863,36 +1941,14 @@ p {
   }
 
   .main {
+    width: 100%;
+    max-width: 1120px;
+    margin-inline: auto;
     padding: 0 56px;
-    max-width: 1040px;
   }
 
   .home-lead {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: 40px;
-    align-items: start;
     padding-top: 48px;
-  }
-
-  .home-lead .lead-photo {
-    margin: 0;
-    position: sticky;
-    top: 32px;
-  }
-
-  .home-lead .block {
-    margin: 0;
-  }
-
-  .home-lead .card {
-    padding: 28px 26px 24px;
-    font-size: 16px;
-  }
-
-  .two {
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
   }
 
   .page-head {
@@ -1901,68 +1957,6 @@ p {
 
   .page-head h1 {
     font-size: 56px;
-  }
-
-  .planner {
-    grid-template-columns: minmax(0, 1fr) 260px;
-    column-gap: 36px;
-    align-items: start;
-  }
-
-  .planner-steps,
-  .enquire {
-    grid-column: 1;
-  }
-
-  .tally {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    position: sticky;
-    top: 28px;
-    bottom: auto;
-    margin: 0;
-  }
-
-  .tally-inner {
-    display: block;
-    border: 1px solid var(--ink);
-    padding: 20px;
-    background: var(--card);
-  }
-
-  .tally-total dt {
-    display: block;
-  }
-
-  .tally-head {
-    margin: 0 0 12px;
-  }
-
-  .tally-cta {
-    width: 100%;
-  }
-
-  .cta-long {
-    display: inline;
-  }
-
-  .cta-short {
-    display: none;
-  }
-
-  .tally .eyebrow,
-  .tally dl > div:not(.tally-total) {
-    display: flex;
-  }
-
-  .tally .eyebrow {
-    display: block;
-  }
-
-  .tally-total {
-    border-top: 1px solid var(--rule);
-    margin-top: 6px;
-    padding-top: 10px !important;
   }
 
   .gallery {
@@ -1988,6 +1982,77 @@ p {
 
   .wine-name {
     font-size: 17px;
+  }
+}
+
+/* Page and photo changes fade in. Opacity only, so sticky children aren't affected. */
+.page-in {
+  animation: fade-in 0.28s ease-out both;
+}
+
+.fade-in {
+  animation: fade-in 0.6s ease-out both;
+}
+
+.rise-in {
+  animation: rise-in 0.25s ease-out both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1199px) {
+  .main {
+    padding: 0 40px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .home-lead {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 40px;
+    align-items: start;
+    padding-top: 48px;
+  }
+
+  .home-lead .lead-wrap {
+    position: sticky;
+    top: 32px;
+  }
+
+  .home-lead .lead-photo {
+    margin: 0;
+  }
+
+  .home-lead .lead-photo .photo-frame {
+    aspect-ratio: 4 / 5 !important;
+  }
+
+  .home-lead .block {
+    margin: 0;
+  }
+
+  .home-lead .card {
+    padding: 28px 26px 24px;
+    font-size: 16px;
   }
 }
 

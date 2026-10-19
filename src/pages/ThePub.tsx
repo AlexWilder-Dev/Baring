@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import Logo, { Star } from '../components/Logo'
+import { Star } from '../components/Logo'
 import Photo from '../components/Photo'
 import PubFront from '../components/PubFront'
 import Rule from '../components/Rule'
@@ -142,8 +142,6 @@ export default function ThePub() {
           ))}
         </ul>
       </section>
-
-      <Logo variant="stacked" className="pub-mark" />
     </article>
   )
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useTime } from '../lib/time'
@@ -7,18 +7,25 @@ import { contact, week } from '../data/baring'
 import WeekStrip from './WeekStrip'
 import StatusStar from './StatusStar'
 
-type Props = { heading?: 'h1' | 'h2'; showWeek?: boolean }
+type Props = { showWeek?: boolean }
 
 export function whenLabel(day: number, minutes: number) {
   return `${week[day].name}, ${openTime(minutes)}`
 }
 
-export default function KitchenClock({ heading = 'h2', showWeek = false }: Props) {
+export default function KitchenClock({ showWeek = false }: Props) {
   const { status, moment, previewing, setPreview } = useTime()
   const [open, setOpen] = useState(showWeek)
   const reduce = useReducedMotion()
-  const Heading = motion[heading]
   const state = status.kitchen ? 'kitchen' : status.bar ? 'bar' : 'closed'
+
+  // While someone drags through the week, hold the tallest height seen so the strip doesn't jump.
+  const wrap = useRef<HTMLDivElement>(null)
+  const [hold, setHold] = useState(0)
+  useLayoutEffect(() => {
+    if (!previewing) return setHold(0)
+    setHold((h) => Math.max(h, wrap.current?.offsetHeight ?? 0))
+  }, [previewing, status.headline, status.detail])
 
   return (
     <section className="clock" aria-label="Is the kitchen open?">
@@ -34,19 +41,10 @@ export default function KitchenClock({ heading = 'h2', showWeek = false }: Props
         )}
       </p>
 
-      <div className="clock-headline-wrap" aria-live="polite">
-        <AnimatePresence mode="wait" initial={false}>
-          <Heading
-            key={status.headline}
-            className="clock-headline"
-            initial={reduce ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
-          >
-            {status.headline}
-          </Heading>
-        </AnimatePresence>
+      <div ref={wrap} className="clock-headline-wrap" aria-live="polite" style={hold ? { minHeight: hold } : undefined}>
+        <h2 key={status.headline} className="clock-headline rise-in">
+          {status.headline}
+        </h2>
         <p className="clock-detail">{status.detail}</p>
       </div>
 

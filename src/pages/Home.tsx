@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
 import KitchenClock from '../components/KitchenClock'
 import Photo from '../components/Photo'
 import PubFront from '../components/PubFront'
@@ -56,23 +55,15 @@ export default function Home() {
       </div>
 
       <div className="home-lead">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={lead.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Photo
-              photo={lead}
-              eager
-              className="lead-photo"
-              caption={candle ? 'Upstairs, after dark.' : 'Quail shish, garlic yoghurt & pul biber chilli'}
-              price={candle ? undefined : '14'}
-            />
-          </motion.div>
-        </AnimatePresence>
+        <div key={lead.id} className="lead-wrap fade-in">
+          <Photo
+            photo={lead}
+            eager
+            className="lead-photo"
+            caption={candle ? 'Upstairs, after dark.' : 'Quail shish, garlic yoghurt & pul biber chilli'}
+            price={candle ? undefined : '14'}
+          />
+        </div>
 
         <ThisWeek />
       </div>
