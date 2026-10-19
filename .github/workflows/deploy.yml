@@ -17,15 +17,21 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      site_url: ${{ steps.pages.outputs.base_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      - id: pages
+        uses: actions/configure-pages@v5
       - run: npm ci
+      # Build for wherever Pages serves this repo, e.g. https://alexwilder-dev.github.io/Baring
       - run: npm run build
-      - uses: actions/configure-pages@v5
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -39,3 +45,29 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  verify:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the live site loads
+        env:
+          SITE_URL: ${{ needs.build.outputs.site_url }}
+        run: |
+          site="${SITE_URL%/}/"
+          origin=$(printf '%s' "$site" | grep -oE '^https://[^/]+')
+          for attempt in $(seq 1 20); do
+            html=$(curl -fsSL "$site" || true)
+            js=$(printf '%s' "$html" | grep -oE 'src="[^"]+\.js"' | head -1 | sed 's/^src="//; s/"$//')
+            if [ -n "$js" ] \
+              && curl -fsS -o /dev/null "$origin$js" \
+              && curl -fsS -o /dev/null -w '%{content_type}' "${site}og.jpg" | grep -q 'image/jpeg' \
+              && printf '%s' "$html" | grep -q "og:image\" content=\"${site}og.jpg\""; then
+              echo "Live and complete: $site (bundle $js)"
+              exit 0
+            fi
+            echo "Attempt $attempt: not ready yet, waiting"
+            sleep 15
+          done
+          echo "Site at $site did not come up with its assets and og.jpg"
+          exit 1

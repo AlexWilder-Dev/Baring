@@ -6,7 +6,7 @@ Demo only: everything runs in the browser on static data. Booking and gift vouch
 pub's existing SevenRooms and GiftPro pages; the private dining enquiry form shows a confirmation and
 sends nothing.
 
-Live: https://alexwilder-dev.github.io/the-baring/
+Live: https://alexwilder-dev.github.io/Baring/
 
 ## What's in it
 
@@ -41,8 +41,10 @@ npm run og        # public/og.jpg, 1200x630, for link previews
 npm run icons     # favicon and apple-touch-icon from the logo
 ```
 
-Pushing to `main` builds and deploys to GitHub Pages (`.github/workflows/deploy.yml`). The site is built
-for the path `/the-baring/` (see `vite.config.ts` and the absolute URLs in `index.html`).
+Pushing to `main` builds and deploys to GitHub Pages (`.github/workflows/deploy.yml`). The workflow asks
+Pages where it serves this repo and builds for that address, so the asset paths and the absolute
+link-preview URLs in `index.html` always match the live site, whatever the repo is called. A final job
+loads the live page, its script bundle and `og.jpg`, and fails the run if any of them don't come back.
 
 ## Research
 
